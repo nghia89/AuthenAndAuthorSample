@@ -44,6 +44,7 @@ namespace BookStore.Data.Repositories
                     BookName = "Sach D",
                     Publisher = "Kim dong"
                 });
+                _context.SaveChanges();
             }
         }
 
