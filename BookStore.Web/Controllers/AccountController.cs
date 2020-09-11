@@ -7,6 +7,7 @@ using BookStore.Data.Repositories;
 using BookStore.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,8 +41,30 @@ namespace BookStore.Web.Controllers
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,principal,new AuthenticationProperties {IsPersistent=false });
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,principal,new AuthenticationProperties {IsPersistent=true });
             return LocalRedirect(loginModel.ReturnUrl);
+        }
+
+        [AllowAnonymous]
+        public IActionResult LoginWithGoogle(string returnUrl = "/")
+        {
+            var props = new AuthenticationProperties
+            {
+                RedirectUri=Url.Action("GoogleLoginCallBack"),
+                Items = { { "return",returnUrl} }
+            };
+            return Challenge(props, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLoginCallBack()
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            var claims = result.Principal.Claims;
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            return LocalRedirect(result.Properties.Items["return"]);
         }
 
         public async Task<IActionResult> LogOut()

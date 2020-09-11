@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BookStore.Data.Extensions;
 using BookStore.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,7 +29,19 @@ namespace BookStore.Web
         {
             services.AddProjectModules();
             services.AddControllersWithViews();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(o => o.Events = new CookieAuthenticationEvents
+                {
+                    OnValidatePrincipal = async (c) =>
+                    {
+                        //check logic//c.RejectPrincipal();
+                    }
+                })
+                .AddGoogle(o =>
+                {
+                    o.ClientId = "26220697082-6135shneln5jgane5bdae74s5t8574ns.apps.googleusercontent.com";
+                    o.ClientSecret = "XkE7inUR1MymGVZPUHrQqB18";
+                });
             services.AddScoped<IUserRepository, UserRepository>();
         }
 
