@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WebNotIdentityFramework.Data;
+using WebNotIdentityFramework.Helper;
 
 [assembly: HostingStartup(typeof(WebNotIdentityFramework.Areas.Identity.IdentityHostingStartup))]
 namespace WebNotIdentityFramework.Areas.Identity
@@ -21,6 +22,7 @@ namespace WebNotIdentityFramework.Areas.Identity
 
                 services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<BookStoreDBContext>();
+                services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AppliUserClaimsPrincipalFactory>();
             });
         }
     }
